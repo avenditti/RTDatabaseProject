@@ -29,11 +29,10 @@ CREATE TABLE tags (
 );
 CREATE TABLE movie_actors (
 	movieID		INT,
-    actorID		INT,
-    actorName	VARCHAR(30),
+    actorID		VARCHAR(40),
+    actorName	VARCHAR(40),
     ranking 	INT,
-    FOREIGN KEY (movieID) REFERENCES movies(id),
-    PRIMARY KEY(actorID)
+    FOREIGN KEY (movieID) REFERENCES movies(id)
 );
 CREATE TABLE movie_countries (
 	movieID 	INT,

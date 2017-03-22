@@ -99,7 +99,6 @@ public class Main extends Application{
 		Scanner scan;
 		String s = "";
 		int i = 0;
-		long time;
 		try {
 			File[] dataFiles = new File("./Rotten_Tomatos_Dataset").listFiles();
 			for(File f : dataFiles) {
@@ -107,62 +106,76 @@ public class Main extends Application{
 				br = new BufferedReader(new FileReader(f));
 				line = "";
 				switch(f.getName()) {
-				case "movies.dat":
-					br.readLine();
-					while((line = br.readLine()) != null) {
-						try {
-						scan = new Scanner(line);
-						scan.useDelimiter("\t");
-						time = System.currentTimeMillis();
-						s = "INSERT INTO movies VALUES (" + scan.next()
-						+ ",\"" + scan.next() + "\""
-						+ "," + scan.next()
-						+ ",\"" + scan.next() + "\""
-						+ ",\"" + scan.next() + "\""
-						+ "," + scan.next()
-						+ ",\"" + scan.next() + "\""
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ "," + scan.next()
-						+ ",\"" + scan.next() + "\""
-						+ ");"
-						;
-						System.out.println(System.currentTimeMillis() - time);
-						db.executeUpdate(s);
-						System.out.println(System.currentTimeMillis() - time);
-						i++;
-						if(i % 1000 == 0) {
-							System.out.print("=");
-						}
-						scan.close();
-						} catch(SQLException e) {
-							s = s.replaceAll(",\"\",", ",'',");
-							s = s.replaceAll("\"\"", "\"");
+					case "movies.dat":
+						br.readLine();
+						while((line = br.readLine()) != null) {
 							try {
-								db.execute(s);
-							} catch (SQLException e1) {
-								d.add(s);
-								i++;
-								if(i % 1000 == 0) {
-									System.out.print("=");
+							scan = new Scanner(line);
+							scan.useDelimiter("\t");
+							s = "INSERT INTO movies VALUES (" + scan.next()
+							+ ",\"" + scan.next() + "\""
+							+ "," + scan.next()
+							+ ",\"" + scan.next() + "\""
+							+ ",\"" + scan.next() + "\""
+							+ "," + scan.next()
+							+ ",\"" + scan.next() + "\""
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ "," + scan.next()
+							+ ",\"" + scan.next() + "\""
+							+ ");"
+							;
+							db.executeUpdate(s);
+							i++;
+							if(i % 1000 == 0) {
+								System.out.print("=");
+							}
+							scan.close();
+							} catch(SQLException e) {
+								s = s.replaceAll(",\"\",", ",'',");
+								s = s.replaceAll("\"\"", "\"");
+								try {
+									db.execute(s);
+								} catch (SQLException e1) {
+									d.add(s);
+									i++;
+									if(i % 1000 == 0) {
+										System.out.print("=");
+									}
 								}
 							}
 						}
-
-					}
-					System.out.println();
-					break;
+						System.out.println();
+						break;
+					case "movie_actors.dat":
+						br.readLine();
+						while((line = br.readLine()) != null) {
+							try {
+							String[] p = line.split("\t");
+							s = "INSERT INTO movie_actors VALUES (" + p[0] + ",\"" + p[1] + "\",\"" + p[2] + "\"," + p[3] + ");";
+							db.executeUpdate(s);
+							i++;
+							if(i % 1000 == 0) {
+								System.out.print("=");
+							}
+							} catch(SQLException e) {
+								d.add(s);
+							}
+						}
+						System.out.println();
+						break;
 					default:
+						break;
 				}
 
 				br.close();
