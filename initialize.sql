@@ -41,7 +41,7 @@ CREATE TABLE movie_countries (
 );
 CREATE TABLE movie_directors (
 	movieID		INT,
-	directorID 	INT,
+	directorID 	VARCHAR(40),
     directorName VARCHAR(40),
     FOREIGN KEY (movieID) REFERENCES movies(id),
     PRIMARY KEY(directorID)
