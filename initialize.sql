@@ -24,13 +24,13 @@ CREATE TABLE movies (
 );
 CREATE TABLE tags (		
 	id			INT,
-    tagValue	VARCHAR(20),
+    tagValue	VARCHAR(80),
     PRIMARY KEY(id)
 );
 CREATE TABLE movie_actors (
 	movieID		INT,
-    actorID		VARCHAR(40),
-    actorName	VARCHAR(40),
+    actorID		VARCHAR(80),
+    actorName	VARCHAR(80),
     ranking 	INT,
     FOREIGN KEY (movieID) REFERENCES movies(id)
 );
@@ -41,10 +41,10 @@ CREATE TABLE movie_countries (
 );
 CREATE TABLE movie_directors (
 	movieID		INT,
-	directorID 	VARCHAR(40),
-    directorName VARCHAR(40),
+	directorID 	VARCHAR(80),
+    directorName VARCHAR(80),
     FOREIGN KEY (movieID) REFERENCES movies(id),
-    PRIMARY KEY(directorID)
+    PRIMARY KEY(movieID)
 );
 CREATE TABLE movie_genres (
 	movieID		INT,
@@ -53,10 +53,10 @@ CREATE TABLE movie_genres (
 );
 CREATE TABLE movie_locations (
 	movieID		INT,
-    location1	VARCHAR(40),
-    location2	VARCHAR(40),
-    location3	VARCHAR(40),
-    location4 	VARCHAR(40),
+    location1	VARCHAR(180),
+    location2	VARCHAR(180),
+    location3	VARCHAR(180),
+    location4 	VARCHAR(180),
     FOREIGN KEY (movieID) REFERENCES movies(id) 	
 );
 CREATE TABLE movie_tags	(
@@ -82,7 +82,7 @@ CREATE TABLE user_ratedmovies_timestamps (
 	userID			INT,
     movieID			INT,
     rating			INT,
-    movieTimeStamp	bigINT,
+    movieTimeStamp	BIGINT,
     FOREIGN KEY (movieID) REFERENCES movies(id)
 );
 CREATE TABLE user_taggedmovies (

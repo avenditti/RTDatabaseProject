@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -83,48 +82,68 @@ public class DatabaseTools {
 		String line;
 		String[] lines;
 		String s = "";
-		String g = "";
 		int i = 0;
+		int datalength;
 		try {
 			File[] dataFiles = new File("./Rotten_Tomatos_Dataset").listFiles();
 			for(File f : dataFiles) {
-				System.out.println("Reading file " + f.getName());
+				System.out.println("Reading file " + f.getName().substring(1));
 				br = new BufferedReader(new FileReader(f));
-				br.readLine();
-				String name = f.getName().substring(0, f.getName().length()-4);
-				g = "INSERT INTO " + name + " VALUES ";
+				datalength = br.readLine().split("\t").length;
+				String name = f.getName().substring(1, f.getName().length()-4);
+				i = 0;
+				System.out.println(datalength);
 				while((line = br.readLine()) != null) {
-					s = "(";
-					lines = line.split("\t");
-					for(String p : lines) {
-						try {
-							Double.parseDouble(p);
-							s += p + ",";
-						} catch(NumberFormatException e) {
-							s += "\"" + p + "\",";
+					try {
+						s = "INSERT INTO " + name + " VALUES (";
+						lines = line.split("\t");
+						for(int g = 0; g < datalength; g++) {
+							try {
+								Double.parseDouble(lines[g]);
+								s += lines[g] + ",";
+							} catch(NumberFormatException e)  {
+								s += "\"" + lines[g] + "\",";
+							} catch(IndexOutOfBoundsException e) {
+								s += "'',";
+							}
 						}
-					}
-					i++;
-
-					s = s.substring(0,s.length()-1) + ")";
-					s = s.replaceAll(",\"\",", ",'',");
-					s = s.replaceAll("\"\"", "\"");
-					g += s + ",";
-					if(i % 1000 == 0) {
-						System.out.print("=");
-						try {
-							db.executeUpdate(g.substring(0,g.length()-1) + ";");
-						} catch (SQLException e) {
-							System.out.println(g.substring(0,g.length()-1) + ";");
-							e.printStackTrace();
+						i++;
+						if(i % 5000 == 0) {
+							System.out.print("=");;
 						}
-						br.close();
+						s = s.substring(0,s.length()-1) + ");";
+						db.executeUpdate(s);
+					} catch(SQLException e) {
+						try {
+							s = s.replaceAll(",\"\",", ",'',");
+							s = s.replaceAll("\"\"", "\"");
+							db.executeUpdate(s);
+						} catch (SQLException e1) {
+							try {
+								s = s.replaceAll(" \"", " ");
+								s = s.replaceAll("\" ", " ");
+								s = s.replace("\"\\N\"", "\\N");
+								db.executeUpdate(s);
+							} catch(SQLException e2) {
+								try {
+									s = s.replace("\", ", ", ");
+									s = s.replace("a\".", "a.");
+									s = s.replace("'\"", "");
+									s = s.replace("2d", "\"2d\"");
+									s = s.replace("3d", "\"3d\"");
+									s = s.replace("Infinity", "\"Infinity\"");
+									db.executeUpdate(s);
+								} catch(SQLException e3) {
+									e.printStackTrace();
+									System.out.println(s);
+								}
+							}
+						}
 					}
 				}
 				System.out.println();
-
+				br.close();
 			}
-
 			for(String p : d) {
 				System.out.println(p);
 			}
