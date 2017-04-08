@@ -13,6 +13,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import Datatypes.ActorResult;
+import Datatypes.DirectorResult;
+import Datatypes.Movie;
+
 public class DatabaseTools {
 
 	private Connection con;
@@ -46,7 +50,7 @@ public class DatabaseTools {
 		return true;
 	}
 
-	boolean initializeDatabase() {
+	public boolean initializeDatabase() {
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/databaseproject?useSSL=false","root", "Mikedu(00");
 			db = con.createStatement();
@@ -75,8 +79,228 @@ public class DatabaseTools {
 		return false;
 	}
 
+	public ArrayList<Movie> getTopMovies(int n) {
+         String sql =
+        		 "SELECT * " +
+        		 "FROM movies " +
+        		 "WHERE id IN  " +
+        		 	"(SELECT MIN(id) " +
+        		 	"FROM movies " +
+        		 	"GROUP BY title) " +
+        		 "ORDER BY rtAudienceNumRating DESC " +
+        		 "LIMIT 100 ";
+         ArrayList<Movie> movies = new ArrayList<Movie>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while (rs.next()) {
+				movies.add(new Movie(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getInt(6),
+						rs.getString(7),
+						rs.getInt(8),
+						rs.getInt(9),
+						rs.getInt(10),
+						rs.getInt(11),
+						rs.getInt(12),
+						rs.getInt(13),
+						rs.getInt(14),
+						rs.getInt(15),
+						rs.getInt(16),
+						rs.getInt(17),
+						rs.getInt(18),
+						rs.getInt(19),
+						rs.getInt(20),
+						rs.getString(21)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+         return movies;
+	}
 
-	static ArrayList<String> d = new ArrayList<String>();
+	public ArrayList<Movie> getMovies(String name) {
+        String sql =
+        		"SELECT * " +
+        		"FROM movies " +
+        		"WHERE lower(title) LIKE " + "\"%"+ name.toLowerCase() + "%\"";
+        ArrayList<Movie> movies = new ArrayList<Movie>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while (rs.next()) {
+				movies.add(new Movie(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getInt(6),
+						rs.getString(7),
+						rs.getInt(8),
+						rs.getInt(9),
+						rs.getInt(10),
+						rs.getInt(11),
+						rs.getInt(12),
+						rs.getInt(13),
+						rs.getInt(14),
+						rs.getInt(15),
+						rs.getInt(16),
+						rs.getInt(17),
+						rs.getInt(18),
+						rs.getInt(19),
+						rs.getInt(20),
+						rs.getString(21)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return movies;
+	}
+
+	public ArrayList<Movie> getMoviesByGenre(String genre, int num) {
+        String sql =
+        		"SELECT * " +
+        		"FROM movies M, movie_genres MG " +
+        		"WHERE MG.movieID = M.id AND lower(MG.genre) LIKE '%" + genre.toLowerCase() + "%' " +
+        		"ORDER BY rtAudienceNumRating DESC " +
+        		"LIMIT " + num;
+        ArrayList<Movie> movies = new ArrayList<Movie>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while (rs.next()) {
+				movies.add(new Movie(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getInt(6),
+						rs.getString(7),
+						rs.getInt(8),
+						rs.getInt(9),
+						rs.getInt(10),
+						rs.getInt(11),
+						rs.getInt(12),
+						rs.getInt(13),
+						rs.getInt(14),
+						rs.getInt(15),
+						rs.getInt(16),
+						rs.getInt(17),
+						rs.getInt(18),
+						rs.getInt(19),
+						rs.getInt(20),
+						rs.getString(21)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return movies;
+	}
+
+	public ArrayList<DirectorResult> getMovieDirector(String name) {
+        String sql =
+        		"SELECT MD.*, M.title " +
+        		"FROM movie_directors MD, movies M " +
+        		"WHERE lower(M.title) LIKE '%" + name.toLowerCase() +"%' AND M.id = MD.movieID";
+        ArrayList<DirectorResult> directors = new ArrayList<DirectorResult>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while(rs.next()) {
+				directors.add(new DirectorResult(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return directors;
+	}
+
+	public ArrayList<Movie> getMoviesByDirector(String name) {
+        String sql =
+        		"SELECT * " +
+           		"FROM movies M, movie_directors MD " +
+           		"WHERE MD.movieID = M.id AND lower(MD.directorName) LIKE '%" + name.toLowerCase() + "%' AND id IN " +
+					"(SELECT MIN(id) " +
+					"FROM movies " +
+					"GROUP BY title) " +
+           		"ORDER BY rtAudienceNumRating DESC ";
+        ArrayList<Movie> movies = new ArrayList<Movie>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while (rs.next()) {
+				movies.add(new Movie(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getInt(6),
+						rs.getString(7),
+						rs.getInt(8),
+						rs.getInt(9),
+						rs.getInt(10),
+						rs.getInt(11),
+						rs.getInt(12),
+						rs.getInt(13),
+						rs.getInt(14),
+						rs.getInt(15),
+						rs.getInt(16),
+						rs.getInt(17),
+						rs.getInt(18),
+						rs.getInt(19),
+						rs.getInt(20),
+						rs.getString(21)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return movies;
+	}
+
+	public ArrayList<ActorResult> getActorMovies(String name) {
+        String sql =
+				"SELECT M.*, MA.actorName " +
+				"FROM movie_actors MA, movies M " +
+				"WHERE MA.movieID = M.id AND lower(MA.actorName) LIKE '%"+ name.toLowerCase() +"%' AND id IN " +
+					"(SELECT MIN(id) " +
+					"FROM movies " +
+				    "GROUP BY title) " +
+				"ORDER BY rtAudienceNumRating DESC ";
+        ArrayList<ActorResult> actorResults = new ArrayList<ActorResult>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while (rs.next()) {
+				actorResults.add(new ActorResult(rs.getString(22), new Movie(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getInt(6),
+						rs.getString(7),
+						rs.getInt(8),
+						rs.getInt(9),
+						rs.getInt(10),
+						rs.getInt(11),
+						rs.getInt(12),
+						rs.getInt(13),
+						rs.getInt(14),
+						rs.getInt(15),
+						rs.getInt(16),
+						rs.getInt(17),
+						rs.getInt(18),
+						rs.getInt(19),
+						rs.getInt(20),
+						rs.getString(21))));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return actorResults;
+	}
+
 	private boolean buildDatabase() {
 		BufferedReader br;
 		String line;
@@ -143,9 +367,6 @@ public class DatabaseTools {
 				}
 				System.out.println();
 				br.close();
-			}
-			for(String p : d) {
-				System.out.println(p);
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("File Not Found");
