@@ -1,4 +1,4 @@
-package main;
+package dbtools;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,11 +12,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import Datatypes.ActorResult;
-import Datatypes.DirectorResult;
-import Datatypes.Movie;
-import Datatypes.TagResult;
 
 public class DatabaseTools {
 
