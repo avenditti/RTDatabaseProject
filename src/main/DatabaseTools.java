@@ -16,6 +16,7 @@ import java.util.Scanner;
 import Datatypes.ActorResult;
 import Datatypes.DirectorResult;
 import Datatypes.Movie;
+import Datatypes.TagResult;
 
 public class DatabaseTools {
 
@@ -77,6 +78,110 @@ public class DatabaseTools {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public ArrayList<TagResult> getMovieTags(String movieTitle) {
+        String sql =
+        		"SELECT M.title, T.tagValue " +
+        		"FROM movies M, tags T " +
+        		"WHERE M.id = T.id AND lower(M.title) LIKE '%" + movieTitle.toLowerCase() + "%' " +
+        		"ORDER BY M.title DESC";
+        ArrayList<TagResult> tags = new ArrayList<TagResult>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while(rs.next()) {
+				tags.add(new TagResult(rs.getString(1), rs.getString(2)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return tags;
+	}
+
+	public ArrayList<ActorResult> getTop10ActorsByAvgMovieScore(int moviesActedIn) {
+        String sql =
+        		"SELECT MA.actorName, AVG(rtAudienceNumRating), COUNT(*) " +
+        		"FROM movie_actors MA, movies M " +
+        		"WHERE MA.movieID = M.id AND M.id IN " +
+        			"(SELECT MIN(id) " +
+        			"FROM movies M " +
+        			"GROUP BY M.title) " +
+        		"GROUP BY MA.actorName " +
+        		"HAVING COUNT(*) > " + moviesActedIn + " " +
+        		"ORDER BY AVG(rtAudienceNumRating) DESC " +
+        		"LIMIT 10";
+        ArrayList<ActorResult> actors = new ArrayList<ActorResult>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while(rs.next()) {
+				actors.add(new ActorResult(rs.getString(1), rs.getInt(2), rs.getInt(3)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return actors;
+	}
+
+	public ArrayList<DirectorResult> getTop10DirectorsByAvgMovieScore(int moviesDirected) {
+        String sql =
+        		"SELECT MD.directorID, MD.directorName, COUNT(*), AVG(rtAudienceNumRating) " +
+        		"FROM movie_directors MD, movies M " +
+        		"WHERE MD.movieID = M.id AND M.id IN " +
+        			"(SELECT MIN(id) " +
+        			"FROM movies M " +
+        			"GROUP BY M.title) " +
+        		"GROUP BY MD.directorName " +
+        		"HAVING COUNT(*) > " + moviesDirected + " " +
+        		"ORDER BY AVG(rtAudienceNumRating) DESC " +
+        		"LIMIT 10";
+        ArrayList<DirectorResult> directors = new ArrayList<DirectorResult>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while(rs.next()) {
+				directors.add(new DirectorResult(rs.getString(1), rs.getString(2), rs.getInt(3), rs.getInt(4)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return directors;
+	}
+
+	public ArrayList<Movie> getMoviesByTag(String tagName) {
+        String sql =
+        		"SELECT M.*" +
+        		"FROM movies M, tags T " +
+        		"WHERE M.id = T.id AND lower(T.tagValue) LIKE '%" + tagName.toLowerCase() + "%'";
+        ArrayList<Movie> movies = new ArrayList<Movie>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while (rs.next()) {
+				movies.add(new Movie(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getInt(6),
+						rs.getString(7),
+						rs.getInt(8),
+						rs.getInt(9),
+						rs.getInt(10),
+						rs.getInt(11),
+						rs.getInt(12),
+						rs.getInt(13),
+						rs.getInt(14),
+						rs.getInt(15),
+						rs.getInt(16),
+						rs.getInt(17),
+						rs.getInt(18),
+						rs.getInt(19),
+						rs.getInt(20),
+						rs.getString(21)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return movies;
 	}
 
 	public ArrayList<Movie> getTopMovies(int n) {
