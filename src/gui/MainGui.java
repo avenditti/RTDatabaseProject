@@ -1,9 +1,327 @@
 package gui;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
+import dbtools.ActorResult;
+import dbtools.DatabaseTools;
+import dbtools.DirectorResult;
+import dbtools.Movie;
+import dbtools.TagResult;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.layout.GridPane;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class MainGui {
+
 	@FXML
-	GridPane infoPane;
+	VBox infoPane;
+	@FXML
+	MenuButton searchButton;
+	@FXML
+	Button buttonRecommend;
+	@FXML
+	public Pane rootPane;
+	@FXML
+	ImageView image1;
+	@FXML
+	ImageView image2;
+	@FXML
+	TextArea infoBox;
+	@FXML
+	TextArea tagBox;
+	@FXML
+	TextArea infoPane1;
+
+	private HBox selected;
+	private Stage parentStage;
+	private Stage recommenderStage;
+	private Recommender r;
+	private double xOffset = 0;
+    private double yOffset = 0;
+    private DatabaseTools data;
+
+	public MainGui(Stage parentStage, DatabaseTools data) throws IOException {
+		this.parentStage = parentStage;
+		this.data = data;
+		recommenderStage = new Stage();
+		FXMLLoader fxml = new FXMLLoader(Recommender.class.getResource("Recommender.fxml"));
+		r = new Recommender(recommenderStage);
+		fxml.setController(r);
+		recommenderStage.initStyle(StageStyle.TRANSPARENT);
+		recommenderStage.setScene(new Scene(fxml.load(), Color.TRANSPARENT));
+		recommenderStage.initOwner(parentStage);
+		r.makeDragable(r.rootPane);
+		/*
+		 * Create Fade In and out Transition
+		 */
+	}
+
+	public void initializeGui() {
+		loadMovieInfo(data.getMovies("Lord of the Rings").get(0));
+		loadActorResultInfoPane1(data.getTop10ActorsByAvgMovieScore(10));
+	}
+
+	public void addMovieList(ArrayList<Movie> movies) {
+		infoPane.getChildren().clear();
+		for(Movie m : movies) {
+			System.out.println("Added " + m.getTitle());
+			addMovieToPane(m);
+		}
+	}
+
+	public void addMovieToPane(Movie m) {
+		HBox b = new HBox();
+		b.setMaxWidth(420);
+		b.setSpacing(20);
+		b.setPrefHeight(25);
+		b.getChildren().add(new Label(m.getTitle()));
+		infoPane.getChildren().add(b);
+		b.setOnMouseClicked((obj) -> {
+			if(selected != null) {
+				selected.setStyle("");
+			}
+			selected = b;
+			selected.setStyle("-fx-background-color: #FFFFFF;");
+			if(obj.getButton().equals(MouseButton.PRIMARY)){
+	            if(obj.getClickCount() == 2){
+	            	loadMovieInfo(m);
+	            }
+	        }
+		});
+	}
+
+	private void loadMovieInfo(Movie m) {
+		infoBox.clear();
+		tagBox.clear();
+		image1.setImage(new Image(m.getImdbPictureURL()));
+		image2.setImage(new Image(m.getRtPictureURL()));
+    	infoBox.appendText(m.toString());
+    	loadMovieTags(data.getMovieTags(m.getTitle()));
+	}
+
+	private void loadMovieTags(ArrayList<TagResult> tags) {
+		for(TagResult t : tags) {
+			tagBox.appendText(t.getTagValue() + "\n");
+    	}
+	}
+
+	private Stage createPrompt(Control... panes) {
+		Stage s = new Stage();
+		VBox b = new VBox();
+		Pane p = new Pane();
+		p.setPrefSize(200, 200);
+		b.setPrefSize(200, 200);
+		b.setAlignment(Pos.CENTER);
+		b.setPadding(new Insets(20,20,20,20));
+		s.initOwner(parentStage);
+		b.setSpacing(20);
+		for (int i = 0; i < panes.length; i++) {
+			b.getChildren().add(panes[i]);
+		}
+		Pane p2 = new Pane(p, b);
+		Button close = new Button("Cancel");
+		close.setOnAction((obj) -> {
+			s.close();
+		});
+		b.getChildren().add(close);
+		makeDragable(p2,s);
+		b.setStyle("-fx-background-color: transparent");
+		p2.setStyle("-fx-background-color: transparent");
+		p.setStyle("-fx-background-color: black;-fx-background-radius: 20");
+		p.setOpacity(.65);
+		s.setResizable(false);
+		s.initStyle(StageStyle.TRANSPARENT);
+		s.initOwner(parentStage);
+		s.setScene(new Scene(p2, Color.TRANSPARENT));
+		return s;
+	}
+
+	@FXML
+	private void closeButton(ActionEvent event) {
+		parentStage.close();
+	}
+
+	@FXML
+	private void buttonRecommend(ActionEvent event) {
+		/*
+		 * Clear list
+		 */
+		recommenderStage.show();
+
+	}
+
+	private void loadTagResultInfoPane1(ArrayList<TagResult> t) {
+		infoPane1.clear();
+		for(TagResult tf : t) {
+			infoPane1.appendText(String.format("%-20s | Tag Data: %-20s\n", tf.getMovieTitle(), tf.getTagValue()));
+		}
+	}
+
+	private void loadActorResultInfoPane1(ArrayList<ActorResult> t) {
+		infoPane1.clear();
+		for(ActorResult tf : t) {
+			infoPane1.appendText(String.format("%-20s | Actor AVG Score: %-20s\n", tf.getActorName(), tf.getAvgMovieScore()));
+		}
+	}
+
+	private void loadDirectorResultInfoPane1(ArrayList<DirectorResult> t) {
+		infoPane1.clear();
+		for(DirectorResult tf : t) {
+			infoPane1.appendText(String.format("%-20s | Actor AVG Score: %-20s\n", tf.getDirectorName(), tf.getAvgMovieScore()));
+		}
+	}
+
+	@FXML
+	private void getMovieTags(ActionEvent event) {
+		TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setPromptText("Enter Movie Name");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			loadTagResultInfoPane1( data.getMovieTags(tf.getText()));
+			s.close();
+		});
+		s.show();
+	}
+
+	@FXML
+	private void getTop10ActorsByAvgMovieScore(ActionEvent event) {
+		TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setPromptText("Enter min movies starred in");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			try {
+				loadActorResultInfoPane1(data.getTop10ActorsByAvgMovieScore(Integer.parseInt(tf.getText())));
+				s.close();
+			} catch(Exception e) {
+				System.out.println("Invalid Input");
+				e.printStackTrace();
+			}
+		});
+		s.show();
+	}
+
+	@FXML
+	private void getTop10DirectorsByAvgMovieScore(ActionEvent event) {
+		TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setPromptText("Enter min movies directed");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			try {
+				loadDirectorResultInfoPane1(data.getTop10DirectorsByAvgMovieScore(Integer.parseInt(tf.getText())));
+				s.close();
+			} catch(Exception e) {
+				System.out.println("Invalid Input");
+				e.printStackTrace();
+			}
+		});
+		s.show();
+	}
+
+	@FXML
+	private void getMoviesByTag(ActionEvent event) {
+		TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setPromptText("Enter Tag");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			addMovieList(data.getMoviesByTag(tf.getText()));
+			s.close();
+		});
+		s.show();
+
+	}
+
+	@FXML
+	private void getTopMovies(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void getMovies(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void getMoviesByGenre(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void getMovieDirector(ActionEvent event) {
+
+	}
+
+	@FXML
+	private void getMoviesByDirector(ActionEvent event) {
+
+	}
+
+	 @FXML
+	private void getActorMovies(ActionEvent event) {
+
+	}
+
+	public void makeDragable(Pane p) {
+		/*
+		 * Make the window draggable by the menu bar
+		 */
+		p.setOnMousePressed(new EventHandler<MouseEvent>() {
+		    @Override
+		    public void handle(MouseEvent event) {
+		        xOffset = event.getSceneX();
+		        yOffset = event.getSceneY();
+		    }
+		});
+		p.setOnMouseDragged(new EventHandler<MouseEvent>() {
+		    @Override
+		    public void handle(MouseEvent event) {
+		    	parentStage.setX(event.getScreenX() - xOffset);
+		    	parentStage.setY(event.getScreenY() - yOffset);
+		    }
+		});
+	}
+	public void makeDragable(Pane p, Stage s) {
+		/*
+		 * Make the window draggable by the menu bar
+		 */
+		p.setOnMousePressed(new EventHandler<MouseEvent>() {
+		    @Override
+		    public void handle(MouseEvent event) {
+		        xOffset = event.getSceneX();
+		        yOffset = event.getSceneY();
+		    }
+		});
+		p.setOnMouseDragged(new EventHandler<MouseEvent>() {
+		    @Override
+		    public void handle(MouseEvent event) {
+		    	s.setX(event.getScreenX() - xOffset);
+		    	s.setY(event.getScreenY() - yOffset);
+		    }
+		});
+	}
+
 }

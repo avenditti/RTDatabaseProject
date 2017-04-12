@@ -95,7 +95,7 @@ public class DatabaseTools {
 
 	public ArrayList<ActorResult> getTop10ActorsByAvgMovieScore(int moviesActedIn) {
         String sql =
-        		"SELECT MA.actorName, AVG(rtAudienceNumRating), COUNT(*) " +
+        		"SELECT MA.actorName, COUNT(*), AVG(rtAudienceNumRating) " +
         		"FROM movie_actors MA, movies M " +
         		"WHERE MA.movieID = M.id AND M.id IN " +
         			"(SELECT MIN(id) " +

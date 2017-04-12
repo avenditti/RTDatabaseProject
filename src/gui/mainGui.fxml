@@ -1,63 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
-<Pane style="-fx-background-radius: 20;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<Pane fx:id="rootPane" prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" style="-fx-background-radius: 5;">
-         <left>
-            <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: red;" BorderPane.alignment="CENTER">
-               <BorderPane.margin>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </BorderPane.margin>
-            </VBox>
-         </left>
+      <Pane opacity="0.65" prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: black; -fx-background-radius: 20;" />
+      <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: transparent;">
          <center>
-            <ScrollPane BorderPane.alignment="CENTER">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0">
-                     <children>
-                        <GridPane>
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                        </GridPane>
-                     </children>
-                  </AnchorPane>
-              </content>
-               <BorderPane.margin>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </BorderPane.margin>
-            </ScrollPane>
-         </center>
-         <top>
-            <HBox spacing="40.0" BorderPane.alignment="TOP_CENTER">
+            <HBox spacing="20.0">
                <children>
-                  <MenuButton mnemonicParsing="false" text="MenuButton" BorderPane.alignment="TOP_LEFT">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                      <MenuItem mnemonicParsing="false" text="Action 2" />
-                    </items>
-                     <BorderPane.margin>
-                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-                     </BorderPane.margin>
-                  </MenuButton>
-                  <TextArea prefHeight="10.0" />
+                  <VBox spacing="6.0">
+                     <children>
+                        <ScrollPane prefHeight="577.0" prefWidth="480.0" BorderPane.alignment="CENTER">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0">
+                                 <children>
+                                    <VBox fx:id="infoPane" minHeight="50.0" prefWidth="440.0" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                           <BorderPane.margin>
+                              <Insets bottom="20.0" left="20.0" right="20.0" />
+                           </BorderPane.margin>
+                        </ScrollPane>
+                        <TextArea fx:id="infoPane1" editable="false" prefHeight="390.0" prefWidth="480.0">
+                           <font>
+                              <Font name="Consolas" size="12.0" />
+                           </font>
+                        </TextArea>
+                     </children>
+                  </VBox>
+                  <Pane prefWidth="460.0">
+                     <children>
+                        <TabPane layoutX="-14.0" layoutY="300.0" prefHeight="395.0" prefWidth="465.0">
+                           <tabs>
+                              <Tab closable="false" text="Movie Info">
+                                 <content>
+                                    <AnchorPane style="-fx-background-color: black;">
+                                       <children>
+                                          <TextArea fx:id="infoBox" editable="false" prefHeight="368.0" prefWidth="465.0">
+                                             <font>
+                                                <Font name="Consolas" size="12.0" />
+                                             </font>
+                                          </TextArea>
+                                       </children>
+                                    </AnchorPane>
+                                 </content>
+                              </Tab>
+                              <Tab closable="false" text="Tag Info">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TextArea fx:id="tagBox" editable="false" prefHeight="368.0" prefWidth="465.0">
+                                             <font>
+                                                <Font name="Consolas" size="12.0" />
+                                             </font>
+                                          </TextArea>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </Tab>
+                           </tabs>
+                        </TabPane>
+                        <ImageView fx:id="image1" fitHeight="290.0" fitWidth="240.0" layoutX="-15.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="image2" fitHeight="290.0" fitWidth="240.0" layoutX="220.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </Pane>
                </children>
                <BorderPane.margin>
                   <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                </BorderPane.margin>
             </HBox>
+         </center>
+         <top>
+            <Pane>
+               <children>
+                  <HBox spacing="40.0" BorderPane.alignment="TOP_CENTER">
+                     <children>
+                        <MenuButton fx:id="searchButton" mnemonicParsing="false" text="Search" BorderPane.alignment="TOP_LEFT">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#getMovieTags" text="Get Movie Tags" />
+                            <MenuItem mnemonicParsing="false" onAction="#getTop10ActorsByAvgMovieScore" text="Top 10 Actors By Avg Movie Score" />
+                              <MenuItem mnemonicParsing="false" onAction="#getTop10DirectorsByAvgMovieScore" text="Top 10 Directors By Avg Movie Score" />
+                              <MenuItem mnemonicParsing="false" onAction="#getMoviesByTag" text="Search Movies By Tag" />
+                              <MenuItem mnemonicParsing="false" onAction="#getTopMovies" text="View Top Movies" />
+                              <MenuItem mnemonicParsing="false" onAction="#getMovies" text="Search Movies" />
+                              <MenuItem mnemonicParsing="false" onAction="#getMoviesByGenre" text="Search Movies By Genre" />
+                              <MenuItem mnemonicParsing="false" onAction="#getMovieDirector" text="Find Movie Director" />
+                              <MenuItem mnemonicParsing="false" onAction="#getMoviesByDirector" text="Search Movies By Director" />
+                              <MenuItem mnemonicParsing="false" onAction="#getActorMovies" text="Search Movies By Actor" />
+                          </items>
+                           <BorderPane.margin>
+                              <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                           </BorderPane.margin>
+                        </MenuButton>
+                        <Button fx:id="buttonRecommend" mnemonicParsing="false" onAction="#buttonRecommend" text="Recommender" />
+                     </children>
+                     <BorderPane.margin>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </BorderPane.margin>
+                  </HBox>
+                  <HBox alignment="TOP_RIGHT" layoutX="855.0" prefHeight="25.0" prefWidth="105.0" spacing="20.0">
+                     <children>
+                        <Button fx:id="close" mnemonicParsing="false" onAction="#closeButton" text="Close" />
+                     </children>
+                  </HBox>
+               </children>
+               <BorderPane.margin>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </BorderPane.margin>
+            </Pane>
          </top>
       </BorderPane>
    </children>

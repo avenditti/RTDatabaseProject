@@ -50,15 +50,26 @@ public class Movie {
 
 	@Override
 	public String toString() {
-		return "Movie [id=" + id + ", title=" + title + ", imdbID=" + imdbID + ", spanishTitle=" + spanishTitle
-				+ ", imdbPictureURL=" + imdbPictureURL + ", year=" + year + ", rtID=" + rtID + ", rtAllCriticsRating="
-				+ rtAllCriticsRating + ", rtAllCriticsNumReviews=" + rtAllCriticsNumReviews + ", rtAllCriticsNumFresh="
-				+ rtAllCriticsNumFresh + ", rtAllCriticsNumRotten=" + rtAllCriticsNumRotten + ", rtAllCriticsScore="
-				+ rtAllCriticsScore + ", rtTopCriticsRating=" + rtTopCriticsRating + ", rtTopCriticsNumReviews="
-				+ rtTopCriticsNumReviews + ", rtTopCriticsNumFresh=" + rtTopCriticsNumFresh + ", rtTopCriticsNumRotten="
-				+ rtTopCriticsNumRotten + ", rtTopCriticsScore=" + rtTopCriticsScore + ", rtAudienceRating="
-				+ rtAudienceRating + ", rtAudienceNumRatings=" + rtAudienceNumRatings + ", rtAudienceScore="
-				+ rtAudienceScore + ", rtPictureURL=" + rtPictureURL + "]";
+		return ""
+				+ "Movie ID: \t" + id + "\n"
+				+ "Movie Title: \t" + title + "\n"
+				+ "Year: \t\t" + year + "\n"
+				+ "imdbID: \t" + imdbID + "\n"
+				+ "rtId: \t\t" + rtID + "\n"
+				+ "Spanish Title: \t" + spanishTitle + "\n\n"
+				+ "All Critics Rating: \t\t" + rtAllCriticsRating + "\n"
+				+ "All Critics Reviews: \t\t" + rtAllCriticsNumReviews + "\n"
+				+ "All Critics Fresh Score: \t" + rtAllCriticsNumFresh + "\n"
+				+ "All Critics Rotten Score: \t" + rtAllCriticsNumRotten + "\n"
+				+ "All Critics Score: \t\t" + rtAllCriticsScore + "\n"
+				+ "Top Critics Rating: \t\t" + rtTopCriticsRating + "\n"
+				+ "Top Critics Reviews: \t\t" + rtTopCriticsNumReviews + "\n"
+				+ "Top Critics Fresh Score: \t" + rtTopCriticsNumFresh + "\n"
+				+ "Top Critics Rotten Score: \t" + rtTopCriticsNumRotten + "\n"
+				+ "Top Critics Score: \t\t" + rtTopCriticsScore + "\n"
+				+ "Audience Rating: \t\t" + rtAudienceRating + "\n"
+				+ "Audience Ratings: \t\t" + rtAudienceNumRatings + "\n"
+				+ "Audience Score: \t\t" + rtAudienceScore;
 	}
 
 	public int getId() {
