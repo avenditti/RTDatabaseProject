@@ -412,6 +412,23 @@ public class DatabaseTools {
         return directors;
 	}
 
+	public ArrayList<DirectorResult> getDirector(String name) {
+		String sql =
+        		"SELECT MD.* " +
+        		"FROM movie_directors MD " +
+        		"WHERE lower(MD.directorName) LIKE '%" + name.toLowerCase() +"%'";
+        ArrayList<DirectorResult> directors = new ArrayList<DirectorResult>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while(rs.next()) {
+				directors.add(new DirectorResult(rs.getInt(1), rs.getString(2), rs.getString(3)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return directors;
+	}
+
 	public ArrayList<Movie> getMoviesByDirector(String name) {
         String sql =
         		"SELECT M.*, MD.directorName " +

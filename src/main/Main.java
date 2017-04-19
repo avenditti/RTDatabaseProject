@@ -30,7 +30,7 @@ public class Main extends Application{
 		primaryStage.initStyle(StageStyle.TRANSPARENT);
 		fxml.setController(mainGui);
 		primaryStage.setScene(new Scene(fxml.load(), Color.TRANSPARENT));
-		mainGui.makeDragable(mainGui.rootPane);
+		mainGui.makeDraggable(mainGui.rootPane);
 		mainGui.initializeGui();
 		primaryStage.show();
 	}

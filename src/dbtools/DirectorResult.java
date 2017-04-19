@@ -23,6 +23,12 @@ public class DirectorResult {
 		this.avgMovieScore = avgMovieScore;
 	}
 
+	public DirectorResult(int movieID, String directorID, String directorName) {
+		this.directorID = directorID;
+		this.directorName = directorName;
+		this.movieID = movieID;
+	}
+
 	public int getMoviesDirected() {
 		return moviesDirected;
 	}

@@ -74,9 +74,6 @@ public class MainGui {
 		recommenderStage.setScene(new Scene(fxml.load(), Color.TRANSPARENT));
 		recommenderStage.initOwner(parentStage);
 		r.makeDraggable(r.rootPane);
-		/*
-		 * Create Fade In and out Transition
-		 */
 	}
 
 	public void initializeGui() {
@@ -146,7 +143,7 @@ public class MainGui {
 			s.close();
 		});
 		b.getChildren().add(close);
-		makeDragable(p2,s);
+		makeDraggable(p2,s);
 		b.setStyle("-fx-background-color: transparent");
 		p2.setStyle("-fx-background-color: transparent");
 		p.setStyle("-fx-background-color: black;-fx-background-radius: 20");
@@ -165,11 +162,8 @@ public class MainGui {
 
 	@FXML
 	private void buttonRecommend(ActionEvent event) {
-		/*
-		 * Clear list
-		 */
+		r.clear();
 		recommenderStage.show();
-
 	}
 
 	private void loadTagResultInfoPane1(ArrayList<TagResult> t) {
@@ -391,10 +385,8 @@ public class MainGui {
 		s.show();
 	}
 
-	public void makeDragable(Pane p) {
-		/*
-		 * Make the window draggable by the menu bar
-		 */
+	public void makeDraggable(Pane p) {
+
 		p.setOnMousePressed(new EventHandler<MouseEvent>() {
 		    @Override
 		    public void handle(MouseEvent event) {
@@ -410,10 +402,8 @@ public class MainGui {
 		    }
 		});
 	}
-	public void makeDragable(Pane p, Stage s) {
-		/*
-		 * Make the window draggable by the menu bar
-		 */
+	public void makeDraggable(Pane p, Stage s) {
+
 		p.setOnMousePressed(new EventHandler<MouseEvent>() {
 		    @Override
 		    public void handle(MouseEvent event) {

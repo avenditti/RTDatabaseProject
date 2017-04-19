@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import dbtools.DatabaseTools;
+import dbtools.DirectorResult;
 import dbtools.Movie;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -26,10 +28,19 @@ public class Recommender {
 	VBox fromPane;
 	@FXML
 	TextField searchField;
+	@FXML
+	Button execute;
+	@FXML
+	Button searchButton;
+	@FXML
+	Button add;
+	@FXML
+	Button remove;
 
 	private HBox selected;
 	private HBox selectedTo;
-	private HashMap<HBox, Movie> selecteds;
+	private HashMap<HBox, Movie> selectedMovies;
+	private HashMap<HBox, DirectorResult> selectedDirectors;
 	private Stage parentStage;
 	private double xOffset = 0;
     private double yOffset = 0;
@@ -38,7 +49,8 @@ public class Recommender {
 	public Recommender(Stage recommenderStage, DatabaseTools data) {
 		parentStage = recommenderStage;
 		this.data = data;
-		selecteds = new HashMap<HBox, Movie>();
+		selectedMovies = new HashMap<HBox, Movie>();
+		selectedDirectors = new HashMap<HBox, DirectorResult>();
 	}
 
 	public void addMovieList(ArrayList<Movie> movies) {
@@ -46,6 +58,46 @@ public class Recommender {
 		for(Movie m : movies) {
 			addMovieToFromPane(m);
 		}
+	}
+
+	public void addDirectorList(ArrayList<DirectorResult> d) {
+		fromPane.getChildren().clear();
+		for(DirectorResult m : d) {
+			addDirectorToFromPane(m);
+		}
+	}
+
+	public void addDirectorToToPane(DirectorResult d) {
+		HBox b = new HBox();
+		b.setMaxWidth(420);
+		b.setSpacing(20);
+		b.setPrefHeight(25);
+		b.getChildren().add(new Label(d.getDirectorName()));
+		toPane.getChildren().add(b);
+		b.setOnMouseClicked((obj) -> {
+			if(selectedTo != null) {
+				selectedTo.setStyle("");
+			}
+			selectedTo = b;
+			selectedTo.setStyle("-fx-background-color: #ff0000;");
+		});
+	}
+
+	public void addDirectorToFromPane(DirectorResult d) {
+		HBox b = new HBox();
+		b.setMaxWidth(420);
+		b.setSpacing(20);
+		b.setPrefHeight(25);
+		b.getChildren().add(new Label(d.getDirectorName()));
+		fromPane.getChildren().add(b);
+		selectedDirectors.put(b, d);
+		b.setOnMouseClicked((obj) -> {
+			if(selected != null) {
+				selected.setStyle("");
+			}
+			selected = b;
+			selected.setStyle("-fx-background-color: #ff0000;");
+		});
 	}
 
 	public void addMovieToToPane(Movie m) {
@@ -71,7 +123,7 @@ public class Recommender {
 		b.setPrefHeight(25);
 		b.getChildren().add(new Label(m.getTitle()));
 		fromPane.getChildren().add(b);
-		selecteds.put(b, m);
+		selectedMovies.put(b, m);
 		b.setOnMouseClicked((obj) -> {
 			if(selected != null) {
 				selected.setStyle("");
@@ -81,31 +133,42 @@ public class Recommender {
 		});
 	}
 
+	@FXML
+	private void recByDirectors(ActionEvent e) {
+		clear();
+		searchField.setPromptText("Enter Director Name");
+		searchButton.setOnAction((obj) -> {
+			addDirectorList(data.getDirector(searchField.getText()));
+		});
+		add.setOnAction((obj) -> {
+			addDirectorToToPane(selectedDirectors.get(selected));
+		});
+		remove.setOnAction((obj) -> {
+			toPane.getChildren().remove(selectedTo);
+		});
+	}
+
+	@FXML
+	private void recByMovies(ActionEvent e) {
+		clear();
+		searchField.setPromptText("Enter Movie Name");
+		searchButton.setOnAction((obj) -> {
+			addMovieList(data.getMovies(searchField.getText()));
+		});
+		add.setOnAction((obj) -> {
+			addMovieToToPane(selectedMovies.get(selected));
+		});
+		remove.setOnAction((obj) -> {
+			toPane.getChildren().remove(selectedTo);
+		});
+	}
 
 	@FXML
 	private void closeButton(ActionEvent e) {
 		parentStage.hide();
 	}
 
-	@FXML
-	private void search() {
-		addMovieList(data.getMovies(searchField.getText()));
-	}
-
-	@FXML
-	private void addMovie(ActionEvent e) {
-		addMovieToToPane(selecteds.get(selected));
-	}
-
-	@FXML
-	private void removeMovie(ActionEvent e) {
-		toPane.getChildren().remove(selectedTo);
-	}
-
 	public void makeDraggable(Pane p) {
-		/*
-		 * Make the window draggable by the menu bar
-		 */
 		p.setOnMousePressed(new EventHandler<MouseEvent>() {
 		    @Override
 		    public void handle(MouseEvent event) {
@@ -120,5 +183,12 @@ public class Recommender {
 		    	parentStage.setY(event.getScreenY() - yOffset);
 		    }
 		});
+	}
+
+	public void clear() {
+		selectedMovies.clear();
+		selectedDirectors.clear();
+		fromPane.getChildren().clear();
+		toPane.getChildren().clear();
 	}
 }
