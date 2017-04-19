@@ -75,13 +75,30 @@ public class DatabaseTools {
 		return false;
 	}
 
+	public String formatMovieTitle(String title) {
+		return title.toLowerCase().replace("'", "");
+	}
+
 	public ArrayList<TagResult> getMovieTags(String movieTitle) {
         String sql =
-        		"SELECT M.title, T.tagValue " +
-        		"FROM movies M, tags T " +
-        		"WHERE M.id = T.id AND lower(M.title) LIKE '%" + movieTitle.toLowerCase() + "%' " +
+        		"SELECT M.title, s.tagValue " +
+        		"FROM movies M, user_taggedmovies T, tags s " +
+        		"WHERE M.id = T.movieID AND lower(M.title) LIKE '%" + formatMovieTitle(movieTitle) + "%' AND T.tagID = s.id " +
         		"ORDER BY M.title DESC";
         ArrayList<TagResult> tags = new ArrayList<TagResult>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while(rs.next()) {
+				tags.add(new TagResult(rs.getString(1),"! UserTagged ! " +  rs.getString(2)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		sql =
+        		"SELECT M.title, s.tagValue " +
+        		"FROM movies M, movie_tags T, tags s " +
+        		"WHERE M.id = T.movieID AND lower(M.title) LIKE '%" + formatMovieTitle(movieTitle) + "%' AND T.tagID = s.id " +
+        		"ORDER BY M.title DESC";
 		try {
 			ResultSet rs = db.executeQuery(sql);
 			while(rs.next()) {
@@ -91,6 +108,25 @@ public class DatabaseTools {
 			e.printStackTrace();
 		}
         return tags;
+	}
+
+	public ArrayList<UserResult> getTimeline(int userID) {
+
+		String sql =
+				"SELECT m.title, UR.userID , UR.rating " +
+				"FROM user_ratedmovies UR, movies M, user_ratedmovies_timestamps U " +
+				"WHERE UR.movieID = M.id AND UR.userID = " + userID + " AND U.movieID = UR.movieID AND UR.movieID = U.movieID AND U.userID = " + userID + " " +
+				"ORDER BY  U.movieTimeStamp";
+		ArrayList<UserResult> userInfo = new ArrayList<UserResult>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while(rs.next()) {
+				userInfo.add(new UserResult(rs.getString(1), rs.getInt(2), rs.getInt(3)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return userInfo;
 	}
 
 	public ArrayList<ActorResult> getTop10ActorsByAvgMovieScore(int moviesActedIn) {
@@ -142,11 +178,44 @@ public class DatabaseTools {
 	}
 
 	public ArrayList<Movie> getMoviesByTag(String tagName) {
-        String sql =
-        		"SELECT M.*" +
-        		"FROM movies M, tags T " +
-        		"WHERE M.id = T.id AND lower(T.tagValue) LIKE '%" + tagName.toLowerCase() + "%'";
+		String sql =
+				"SELECT M.* " +
+				"FROM movies M, user_taggedmovies T, tags s " +
+				"WHERE M.id = T.movieID AND T.tagID = s.id AND lower(s.tagValue) LIKE '%" + tagName.toLowerCase() + "%' ";
         ArrayList<Movie> movies = new ArrayList<Movie>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while (rs.next()) {
+				movies.add(new Movie(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getInt(6),
+						rs.getString(7),
+						rs.getInt(8),
+						rs.getInt(9),
+						rs.getInt(10),
+						rs.getInt(11),
+						rs.getInt(12),
+						rs.getInt(13),
+						rs.getInt(14),
+						rs.getInt(15),
+						rs.getInt(16),
+						rs.getInt(17),
+						rs.getInt(18),
+						rs.getInt(19),
+						rs.getInt(20),
+						rs.getString(21)));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		sql =
+			"SELECT M.* " +
+			"FROM movies M, movie_tags T, tags s " +
+			"WHERE M.id = T.movieID AND T.tagID = s.id AND lower(s.tagValue) LIKE '%" + tagName.toLowerCase() + "%' ";
 		try {
 			ResultSet rs = db.executeQuery(sql);
 			while (rs.next()) {
@@ -222,11 +291,12 @@ public class DatabaseTools {
          return movies;
 	}
 
-	public ArrayList<Movie> getMovies(String name) {
+	public ArrayList<Movie> getMovies(String movieTitle) {
         String sql =
         		"SELECT * " +
         		"FROM movies " +
-        		"WHERE lower(title) LIKE " + "\"%"+ name.toLowerCase() + "%\"";
+        		"WHERE lower(title) LIKE " + "\"%"+ formatMovieTitle(movieTitle) + "%\" " +
+				"ORDER BY title";
         ArrayList<Movie> movies = new ArrayList<Movie>();
 		try {
 			ResultSet rs = db.executeQuery(sql);

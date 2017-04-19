@@ -96,6 +96,7 @@
                               <MenuItem mnemonicParsing="false" onAction="#getMovieDirector" text="Find Movie Director" />
                               <MenuItem mnemonicParsing="false" onAction="#getMoviesByDirector" text="Search Movies By Director" />
                               <MenuItem mnemonicParsing="false" onAction="#getActorMovies" text="Search Movies By Actor" />
+                              <MenuItem mnemonicParsing="false" onAction="#getUserRatingTimeline" text="Get User Rating Timeline" />
                           </items>
                            <BorderPane.margin>
                               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />

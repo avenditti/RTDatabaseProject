@@ -8,6 +8,7 @@ import dbtools.DatabaseTools;
 import dbtools.DirectorResult;
 import dbtools.Movie;
 import dbtools.TagResult;
+import dbtools.UserResult;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -66,12 +67,12 @@ public class MainGui {
 		this.data = data;
 		recommenderStage = new Stage();
 		FXMLLoader fxml = new FXMLLoader(Recommender.class.getResource("Recommender.fxml"));
-		r = new Recommender(recommenderStage);
+		r = new Recommender(recommenderStage, data);
 		fxml.setController(r);
 		recommenderStage.initStyle(StageStyle.TRANSPARENT);
 		recommenderStage.setScene(new Scene(fxml.load(), Color.TRANSPARENT));
 		recommenderStage.initOwner(parentStage);
-		r.makeDragable(r.rootPane);
+		r.makeDraggable(r.rootPane);
 		/*
 		 * Create Fade In and out Transition
 		 */
@@ -85,7 +86,6 @@ public class MainGui {
 	public void addMovieList(ArrayList<Movie> movies) {
 		infoPane.getChildren().clear();
 		for(Movie m : movies) {
-			System.out.println("Added " + m.getTitle());
 			addMovieToPane(m);
 		}
 	}
@@ -174,7 +174,7 @@ public class MainGui {
 	private void loadTagResultInfoPane1(ArrayList<TagResult> t) {
 		infoPane1.clear();
 		for(TagResult tf : t) {
-			infoPane1.appendText(String.format("%-20s | Tag Data: %-20s\n", tf.getMovieTitle(), tf.getTagValue()));
+			infoPane1.appendText(String.format("%-40s | Tag Data: %-20s\n", tf.getMovieTitle().length() > 40 ? tf.getMovieTitle().subSequence(0, 37) + "..." : tf.getMovieTitle(), tf.getTagValue()));
 		}
 	}
 
@@ -188,15 +188,45 @@ public class MainGui {
 	private void loadDirectorResultInfoPane1(ArrayList<DirectorResult> t) {
 		infoPane1.clear();
 		for(DirectorResult tf : t) {
-			infoPane1.appendText(String.format("%-20s | Actor AVG Score: %-20s\n", tf.getDirectorName(), tf.getAvgMovieScore()));
+			try {
+				infoPane1.appendText(String.format("%-20s %-20s | Director AVG Score: %-20s\n", tf.getMovieName().length() > 40 ? tf.getMovieName().subSequence(0, 37) + "..." : tf.getMovieName(), tf.getDirectorName(), tf.getAvgMovieScore()));
+			} catch(NullPointerException e) {
+				infoPane1.appendText(String.format("%-20s %-20s \n", tf.getDirectorName(), tf.getAvgMovieScore()));
+			}
 		}
+	}
+
+	private void loadUserTimelineInfoPane1(ArrayList<UserResult> t) {
+		infoPane1.clear();
+		for(UserResult tf : t) {
+			infoPane1.appendText(String.format("%-5s| %-40s | Score: %-20d\n", tf.getUserName(), tf.getMovieName().length() > 40 ? tf.getMovieName().subSequence(0, 37) + "..." : tf.getMovieName() , tf.getUserRating()));
+		}
+	}
+
+
+	@FXML
+	private void getUserRatingTimeline(ActionEvent event) {
+		TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setPromptText("EnterUserId");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			try {
+				loadUserTimelineInfoPane1(data.getTimeline(Integer.parseInt(tf.getText())));
+				s.close();
+			} catch(Exception e) {
+				System.out.println("Invalid Input");
+				e.printStackTrace();
+			}
+		});
+		s.show();
 	}
 
 	@FXML
 	private void getMovieTags(ActionEvent event) {
 		TextField tf = new TextField();
 		Button b1 = new Button("Enter");
-		tf.setPromptText("Enter Movie Name");
+		tf.setText("Enter Movie Name");
 		Stage s = createPrompt(tf, b1);
 		b1.setOnAction((obj) -> {
 			loadTagResultInfoPane1( data.getMovieTags(tf.getText()));
@@ -209,7 +239,7 @@ public class MainGui {
 	private void getTop10ActorsByAvgMovieScore(ActionEvent event) {
 		TextField tf = new TextField();
 		Button b1 = new Button("Enter");
-		tf.setPromptText("Enter min movies starred in");
+		tf.setText("Enter min movies starred in");
 		Stage s = createPrompt(tf, b1);
 		b1.setOnAction((obj) -> {
 			try {
@@ -217,7 +247,6 @@ public class MainGui {
 				s.close();
 			} catch(Exception e) {
 				System.out.println("Invalid Input");
-				e.printStackTrace();
 			}
 		});
 		s.show();
@@ -227,15 +256,15 @@ public class MainGui {
 	private void getTop10DirectorsByAvgMovieScore(ActionEvent event) {
 		TextField tf = new TextField();
 		Button b1 = new Button("Enter");
-		tf.setPromptText("Enter min movies directed");
+		tf.setText("Enter min movies directed");
 		Stage s = createPrompt(tf, b1);
 		b1.setOnAction((obj) -> {
 			try {
 				loadDirectorResultInfoPane1(data.getTop10DirectorsByAvgMovieScore(Integer.parseInt(tf.getText())));
 				s.close();
 			} catch(Exception e) {
-				System.out.println("Invalid Input");
 				e.printStackTrace();
+				System.out.println("Invalid Input");
 			}
 		});
 		s.show();
@@ -245,44 +274,109 @@ public class MainGui {
 	private void getMoviesByTag(ActionEvent event) {
 		TextField tf = new TextField();
 		Button b1 = new Button("Enter");
-		tf.setPromptText("Enter Tag");
+		tf.setText("Enter Tag");
 		Stage s = createPrompt(tf, b1);
 		b1.setOnAction((obj) -> {
 			addMovieList(data.getMoviesByTag(tf.getText()));
 			s.close();
 		});
 		s.show();
-
 	}
 
 	@FXML
 	private void getTopMovies(ActionEvent event) {
-
+		TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setText("Amount of movies");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			try {
+				addMovieList(data.getTopMovies(Integer.parseInt(tf.getText())));
+			} catch(Exception e) {
+				System.out.println("Invalid Data");
+			}
+			s.close();
+		});
+		s.show();
 	}
 
 	@FXML
 	private void getMovies(ActionEvent event) {
-
+		TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setText("Movie Title");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			addMovieList(data.getMovies(tf.getText()));
+			s.close();
+		});
+		s.show();
 	}
 
 	@FXML
 	private void getMoviesByGenre(ActionEvent event) {
-
+		TextField tf = new TextField();
+		TextField tf1 = new TextField();
+		Button b1 = new Button("Enter");
+		tf1.setText("Amount of Movies");
+		tf.setText("Genre");
+		Stage s = createPrompt(tf, tf1, b1);
+		b1.setOnAction((obj) -> {
+			addMovieList(data.getMoviesByGenre(tf.getText(), Integer.parseInt(tf1.getText())));
+			s.close();
+		});
+		s.show();
 	}
 
 	@FXML
 	private void getMovieDirector(ActionEvent event) {
-
+		TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setText("Enter Movie Name");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			try {
+				loadDirectorResultInfoPane1(data.getMovieDirector(tf.getText()));
+				s.close();
+			} catch(Exception e) {
+				System.out.println("Invalid Input");
+			}
+		});
+		s.show();
 	}
 
 	@FXML
 	private void getMoviesByDirector(ActionEvent event) {
-
+		TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setText("Director Name");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			infoPane1.clear();
+			addMovieList(data.getMoviesByDirector(tf.getText()));
+			s.close();
+		});
+		s.show();
 	}
 
 	 @FXML
 	private void getActorMovies(ActionEvent event) {
-
+		 TextField tf = new TextField();
+		Button b1 = new Button("Enter");
+		tf.setText("Actor Name");
+		Stage s = createPrompt(tf, b1);
+		b1.setOnAction((obj) -> {
+			ArrayList<ActorResult> actors = data.getActorMovies(tf.getText());
+			infoPane1.clear();
+			ArrayList<Movie> movies = new ArrayList<Movie>();
+			for(ActorResult g : actors) {
+				movies.add(g.getMovie());
+				infoPane1.appendText(String.format("%-20s | Movie Name: %-20s\n", g.getActorName(), g.getMovie().getTitle() ));
+			}
+			addMovieList(movies);
+			s.close();
+		});
+		s.show();
 	}
 
 	public void makeDragable(Pane p) {
