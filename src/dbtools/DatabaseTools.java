@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class DatabaseTools {
@@ -110,10 +111,10 @@ public class DatabaseTools {
         return tags;
 	}
 
-	public ArrayList<UserResult> getTimeline(int userID) {
+	public UserTimeline getTimeline(int userID) {
 
 		String sql =
-				"SELECT m.title, UR.userID , UR.rating " +
+				"SELECT m.title, UR.* " +
 				"FROM user_ratedmovies UR, movies M, user_ratedmovies_timestamps U " +
 				"WHERE UR.movieID = M.id AND UR.userID = " + userID + " AND U.movieID = UR.movieID AND UR.movieID = U.movieID AND U.userID = " + userID + " " +
 				"ORDER BY  U.movieTimeStamp";
@@ -121,12 +122,36 @@ public class DatabaseTools {
 		try {
 			ResultSet rs = db.executeQuery(sql);
 			while(rs.next()) {
-				userInfo.add(new UserResult(rs.getString(1), rs.getInt(2), rs.getInt(3)));
+				userInfo.add(new UserResult(
+						rs.getString(1),
+						rs.getInt(2),
+						rs.getInt(4),
+						rs.getInt(5),
+						rs.getInt(6),
+						rs.getInt(7),
+						rs.getInt(8),
+						rs.getInt(9),
+						rs.getInt(10)
+						));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return userInfo;
+		HashMap<String, Integer> gb = new HashMap<String, Integer>();
+		sql =
+			"SELECT MG.genre, COUNT(MG.genre) " +
+			"FROM user_ratedmovies UR, movies M, movie_genres MG " +
+			"WHERE UR.movieID = M.id AND MG.movieID = M.id AND UR.userID = " + userID + " " +
+			"GROUP BY UR.userID, MG.genre ";
+		try {
+			ResultSet rs = db.executeQuery(sql);
+			while(rs.next()) {
+				gb.put(rs.getString(1), rs.getInt(2));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return new UserTimeline(userInfo, gb);
 	}
 
 	public ArrayList<ActorResult> getTop10ActorsByAvgMovieScore(int moviesActedIn) {
@@ -389,7 +414,7 @@ public class DatabaseTools {
 
 	public ArrayList<Movie> getMoviesByDirector(String name) {
         String sql =
-        		"SELECT * " +
+        		"SELECT M.*, MD.directorName " +
            		"FROM movies M, movie_directors MD " +
            		"WHERE MD.movieID = M.id AND lower(MD.directorName) LIKE '%" + name.toLowerCase() + "%' AND id IN " +
 					"(SELECT MIN(id) " +
@@ -421,7 +446,9 @@ public class DatabaseTools {
 						rs.getInt(18),
 						rs.getInt(19),
 						rs.getInt(20),
-						rs.getString(21)));
+						rs.getString(21),
+						rs.getString(22)));
+
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

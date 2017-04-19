@@ -9,6 +9,7 @@ import dbtools.DirectorResult;
 import dbtools.Movie;
 import dbtools.TagResult;
 import dbtools.UserResult;
+import dbtools.UserTimeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -102,7 +103,7 @@ public class MainGui {
 				selected.setStyle("");
 			}
 			selected = b;
-			selected.setStyle("-fx-background-color: #FFFFFF;");
+			selected.setStyle("-fx-background-color: #ff0000;");
 			if(obj.getButton().equals(MouseButton.PRIMARY)){
 	            if(obj.getClickCount() == 2){
 	            	loadMovieInfo(m);
@@ -189,17 +190,24 @@ public class MainGui {
 		infoPane1.clear();
 		for(DirectorResult tf : t) {
 			try {
-				infoPane1.appendText(String.format("%-20s %-20s | Director AVG Score: %-20s\n", tf.getMovieName().length() > 40 ? tf.getMovieName().subSequence(0, 37) + "..." : tf.getMovieName(), tf.getDirectorName(), tf.getAvgMovieScore()));
+				infoPane1.appendText(String.format("%-20s %-20s \n", tf.getMovieName().length() > 40 ? tf.getMovieName().subSequence(0, 37) + "..." : tf.getMovieName(), tf.getDirectorName()));
 			} catch(NullPointerException e) {
 				infoPane1.appendText(String.format("%-20s %-20s \n", tf.getDirectorName(), tf.getAvgMovieScore()));
 			}
 		}
 	}
 
-	private void loadUserTimelineInfoPane1(ArrayList<UserResult> t) {
+	private void loadUserTimelineInfoPane1(UserTimeline ut) {
 		infoPane1.clear();
-		for(UserResult tf : t) {
-			infoPane1.appendText(String.format("%-5s| %-40s | Score: %-20d\n", tf.getUserName(), tf.getMovieName().length() > 40 ? tf.getMovieName().subSequence(0, 37) + "..." : tf.getMovieName() , tf.getUserRating()));
+		int sum = 0;
+		for(Integer i : ut.getGenreBreakdown().values()) {
+			sum += i;
+		}
+		for(String s : ut.getGenreBreakdown().keySet()) {
+			infoPane1.appendText(String.format("%-10s Total: %4d Total Percentage of Whole: %-5.3f \n", s, ut.getGenreBreakdown().get(s), (double)ut.getGenreBreakdown().get(s) / (double)sum));
+		}
+		for(UserResult tf : ut.getUserResults()) {
+			infoPane1.appendText(String.format("%-5s| %-25s | Score: %-2d | %-2d / %-2d / %-4d | %-2d : %-2d : %-2d\n", tf.getUserName(), tf.getMovieName().length() > 25 ? tf.getMovieName().subSequence(0, 22) + "..." : tf.getMovieName() , tf.getUserRating(), tf.getMonth(), tf.getDay(), tf.getYear(), tf.getHour(), tf.getMinute(), tf.getSecond()));
 		}
 	}
 
@@ -208,7 +216,7 @@ public class MainGui {
 	private void getUserRatingTimeline(ActionEvent event) {
 		TextField tf = new TextField();
 		Button b1 = new Button("Enter");
-		tf.setPromptText("EnterUserId");
+		tf.setText("Enter User Id");
 		Stage s = createPrompt(tf, b1);
 		b1.setOnAction((obj) -> {
 			try {
@@ -353,7 +361,11 @@ public class MainGui {
 		Stage s = createPrompt(tf, b1);
 		b1.setOnAction((obj) -> {
 			infoPane1.clear();
-			addMovieList(data.getMoviesByDirector(tf.getText()));
+			ArrayList<Movie> movies =  data.getMoviesByDirector(tf.getText());
+			addMovieList(movies);
+			for(Movie m : movies) {
+				infoPane1.appendText(String.format("%-40s %-20s \n",  m.getTitle().length() > 40 ?  m.getTitle().subSequence(0, 37) + "..." : m.getTitle(),  m.getDirectorName()));
+			}
 			s.close();
 		});
 		s.show();

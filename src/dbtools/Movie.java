@@ -23,6 +23,7 @@ public class Movie {
 	private int rtAudienceNumRatings;
 	private int rtAudienceScore;
 	private String rtPictureURL;
+	private String directorName;
 
 	public Movie(int id, String title, String imdbID, String spanishTitle, String imdbPictureURL, int year, String rtID, int rtAllCriticsRating, int rtAllCriticsNumReviews, int rtAllCriticsNumFresh, int rtAllCriticsNumRotten, int rtAllCriticsScore, int rtTopCriticsRating, int rtTopCriticsNumReviews, int rtTopCriticsNumFresh, int rtTopCriticsNumRotten, int rtTopCriticsScore, int rtAudienceRating, int rtAudienceNumRatings, int rtAudienceScore, String rtPictureURL) {
 		this.id = id;
@@ -47,6 +48,36 @@ public class Movie {
 		this.rtAudienceScore = rtAudienceScore;
 		this.rtPictureURL = rtPictureURL;
 	}
+
+	public Movie(int id, String title, String imdbID, String spanishTitle, String imdbPictureURL, int year, String rtID, int rtAllCriticsRating, int rtAllCriticsNumReviews, int rtAllCriticsNumFresh, int rtAllCriticsNumRotten, int rtAllCriticsScore, int rtTopCriticsRating, int rtTopCriticsNumReviews, int rtTopCriticsNumFresh, int rtTopCriticsNumRotten, int rtTopCriticsScore, int rtAudienceRating, int rtAudienceNumRatings, int rtAudienceScore, String rtPictureURL, String directorName) {
+		this.id = id;
+		this.title = title;
+		this.imdbID = imdbID;
+		this.spanishTitle = spanishTitle;
+		this.imdbPictureURL = imdbPictureURL;
+		this.year= year;
+		this.rtID = rtID;
+		this.rtAllCriticsRating = rtAllCriticsRating;
+		this.rtAllCriticsNumReviews = rtAllCriticsNumReviews;
+		this.rtAllCriticsNumFresh = rtAllCriticsNumFresh;
+		this.rtAllCriticsNumRotten = rtAllCriticsNumRotten;
+		this.rtAllCriticsScore = rtAllCriticsScore;
+		this.rtTopCriticsRating = rtTopCriticsRating;
+		this.rtTopCriticsNumReviews = rtTopCriticsNumReviews;
+		this.rtTopCriticsNumFresh = rtTopCriticsNumFresh;
+		this.rtTopCriticsNumRotten = rtTopCriticsNumRotten;
+		this.rtTopCriticsScore = rtTopCriticsScore;
+		this.rtAudienceRating = rtAudienceRating;
+		this.rtAudienceNumRatings = rtAudienceNumRatings;
+		this.rtAudienceScore = rtAudienceScore;
+		this.rtPictureURL = rtPictureURL;
+		this.directorName = directorName;
+	}
+
+	public String getDirectorName() {
+		return directorName;
+	}
+
 
 	@Override
 	public String toString() {
