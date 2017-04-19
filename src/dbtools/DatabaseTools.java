@@ -47,6 +47,11 @@ public class DatabaseTools {
 		return true;
 	}
 
+	private ResultSet executeQuery(String sql) throws SQLException {
+		ResultSet result = db.executeQuery(sql);
+		return result;
+	}
+
 	public boolean initializeDatabase() {
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/databaseproject?useSSL=false","root", "Mikedu(00");
@@ -88,7 +93,7 @@ public class DatabaseTools {
         		"ORDER BY M.title DESC";
         ArrayList<TagResult> tags = new ArrayList<TagResult>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while(rs.next()) {
 				tags.add(new TagResult(rs.getString(1),"! UserTagged ! " +  rs.getString(2)));
 			}
@@ -101,7 +106,7 @@ public class DatabaseTools {
         		"WHERE M.id = T.movieID AND lower(M.title) LIKE '%" + formatMovieTitle(movieTitle) + "%' AND T.tagID = s.id " +
         		"ORDER BY M.title DESC";
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while(rs.next()) {
 				tags.add(new TagResult(rs.getString(1), rs.getString(2)));
 			}
@@ -120,7 +125,7 @@ public class DatabaseTools {
 				"ORDER BY  U.movieTimeStamp";
 		ArrayList<UserResult> userInfo = new ArrayList<UserResult>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while(rs.next()) {
 				userInfo.add(new UserResult(
 						rs.getString(1),
@@ -144,7 +149,7 @@ public class DatabaseTools {
 			"WHERE UR.movieID = M.id AND MG.movieID = M.id AND UR.userID = " + userID + " " +
 			"GROUP BY UR.userID, MG.genre ";
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while(rs.next()) {
 				gb.put(rs.getString(1), rs.getInt(2));
 			}
@@ -168,7 +173,7 @@ public class DatabaseTools {
         		"LIMIT 10";
         ArrayList<ActorResult> actors = new ArrayList<ActorResult>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while(rs.next()) {
 				actors.add(new ActorResult(rs.getString(1), rs.getInt(2), rs.getInt(3)));
 			}
@@ -192,7 +197,7 @@ public class DatabaseTools {
         		"LIMIT 10";
         ArrayList<DirectorResult> directors = new ArrayList<DirectorResult>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while(rs.next()) {
 				directors.add(new DirectorResult(rs.getString(1), rs.getString(2), rs.getInt(3), rs.getInt(4)));
 			}
@@ -209,7 +214,7 @@ public class DatabaseTools {
 				"WHERE M.id = T.movieID AND T.tagID = s.id AND lower(s.tagValue) LIKE '%" + tagName.toLowerCase() + "%' ";
         ArrayList<Movie> movies = new ArrayList<Movie>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while (rs.next()) {
 				movies.add(new Movie(
 						rs.getInt(1),
@@ -242,7 +247,7 @@ public class DatabaseTools {
 			"FROM movies M, movie_tags T, tags s " +
 			"WHERE M.id = T.movieID AND T.tagID = s.id AND lower(s.tagValue) LIKE '%" + tagName.toLowerCase() + "%' ";
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while (rs.next()) {
 				movies.add(new Movie(
 						rs.getInt(1),
@@ -285,7 +290,7 @@ public class DatabaseTools {
         		 "LIMIT 100 ";
          ArrayList<Movie> movies = new ArrayList<Movie>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while (rs.next()) {
 				movies.add(new Movie(
 						rs.getInt(1),
@@ -324,7 +329,7 @@ public class DatabaseTools {
 				"ORDER BY title";
         ArrayList<Movie> movies = new ArrayList<Movie>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while (rs.next()) {
 				movies.add(new Movie(
 						rs.getInt(1),
@@ -364,7 +369,7 @@ public class DatabaseTools {
         		"LIMIT " + num;
         ArrayList<Movie> movies = new ArrayList<Movie>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while (rs.next()) {
 				movies.add(new Movie(
 						rs.getInt(1),
@@ -402,7 +407,7 @@ public class DatabaseTools {
         		"WHERE lower(M.title) LIKE '%" + name.toLowerCase() +"%' AND M.id = MD.movieID";
         ArrayList<DirectorResult> directors = new ArrayList<DirectorResult>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while(rs.next()) {
 				directors.add(new DirectorResult(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4)));
 			}
@@ -419,7 +424,7 @@ public class DatabaseTools {
         		"WHERE lower(MD.directorName) LIKE '%" + name.toLowerCase() +"%'";
         ArrayList<DirectorResult> directors = new ArrayList<DirectorResult>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while(rs.next()) {
 				directors.add(new DirectorResult(rs.getInt(1), rs.getString(2), rs.getString(3)));
 			}
@@ -440,7 +445,7 @@ public class DatabaseTools {
            		"ORDER BY rtAudienceNumRating DESC ";
         ArrayList<Movie> movies = new ArrayList<Movie>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while (rs.next()) {
 				movies.add(new Movie(
 						rs.getInt(1),
@@ -484,7 +489,7 @@ public class DatabaseTools {
 				"ORDER BY rtAudienceNumRating DESC ";
         ArrayList<ActorResult> actorResults = new ArrayList<ActorResult>();
 		try {
-			ResultSet rs = db.executeQuery(sql);
+			ResultSet rs = executeQuery(sql);
 			while (rs.next()) {
 				actorResults.add(new ActorResult(rs.getString(22), new Movie(
 						rs.getInt(1),

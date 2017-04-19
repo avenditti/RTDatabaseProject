@@ -124,7 +124,7 @@ public class MainGui {
     	}
 	}
 
-	private Stage createPrompt(Control... panes) {
+	public Stage createPrompt(Control... panes) {
 		Stage s = new Stage();
 		VBox b = new VBox();
 		Pane p = new Pane();
