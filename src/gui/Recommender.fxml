@@ -43,6 +43,7 @@
                         <Button fx:id="add" mnemonicParsing="false" text="&gt;" />
                         <Button fx:id="remove" mnemonicParsing="false" text="&lt;" />
                         <Button fx:id="execute" mnemonicParsing="false" text="Execute" />
+                        <Button mnemonicParsing="false" onAction="#clear" text="Clear" />
                      </children>
                   </VBox>
                   <ScrollPane prefWidth="380.0">

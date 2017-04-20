@@ -20,7 +20,7 @@ public class DatabaseTools {
 	private Statement db;
 	private ResultSet rs;
 	private static final String sqlInitializeLocation = "initialize.sql";
-	private static final String serverIP = "192.168.1.114";
+	private static final String serverIP = "localhost";
 	private static final String port = "3306";
 	private static final String username = "root";
 	private static final String pass = "admin1234";
@@ -327,19 +327,15 @@ public class DatabaseTools {
 
 	public ArrayList<String> getMovieGenres(String movieTitle) {
         String sql =
-        		"SELECT M.title, MG.genre " +
+        		"SELECT MG.genre " +
         		"FROM movies M, movie_genres MG " +
         		"WHERE lower(M.title) LIKE " + "\"%"+ formatMovieTitle(movieTitle) + "%\" AND MG.movieID = M.id " +
 				"ORDER BY M.title";
         ArrayList<String> genres = new ArrayList<String>();
 		try {
 			ResultSet rs = db.executeQuery(sql);
-// --------------
 			while (rs.next()) {
-				if(!(genres.size() > 0)) {
-					genres.add(rs.getString(1));
-				}
-				genres.add(rs.getString(2));
+				genres.add(rs.getString(1));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -351,7 +347,10 @@ public class DatabaseTools {
         String sql =
         		"SELECT M.* " +
         		"FROM movies M " +
-        		"WHERE lower(M.title) LIKE " + "\"%"+ formatMovieTitle(movieTitle) + "%\" " +
+        		"WHERE lower(M.title) LIKE " + "\"%"+ formatMovieTitle(movieTitle) + "%\" AND M.id IN" +
+	        		"(SELECT MIN(id) " +
+					"FROM movies " +
+					"GROUP BY title) " +
 				"ORDER BY M.title";
         ArrayList<Movie> movies = new ArrayList<Movie>();
 		try {
@@ -390,7 +389,10 @@ public class DatabaseTools {
         String sql =
         		"SELECT * " +
         		"FROM movies M, movie_genres MG " +
-        		"WHERE MG.movieID = M.id AND lower(MG.genre) LIKE '%" + genre.toLowerCase() + "%' " +
+        		"WHERE MG.movieID = M.id AND lower(MG.genre) LIKE '%" + genre.toLowerCase() + "%' AND id IN " +
+					"(SELECT MIN(id) " +
+					"FROM movies " +
+					"GROUP BY title) " +
         		"ORDER BY rtAudienceNumRating DESC " +
         		"LIMIT " + num;
         ArrayList<Movie> movies = new ArrayList<Movie>();
@@ -430,7 +432,8 @@ public class DatabaseTools {
         String sql =
         		"SELECT MD.*, M.title " +
         		"FROM movie_directors MD, movies M " +
-        		"WHERE lower(M.title) LIKE '%" + name.toLowerCase() +"%' AND M.id = MD.movieID";
+        		"WHERE lower(M.title) LIKE '%" + formatMovieTitle(name) +"%' AND M.id = MD.movieID " +
+				"ORDER BY M.rtAudienceNumRating DESC";
         ArrayList<DirectorResult> directors = new ArrayList<DirectorResult>();
 		try {
 			ResultSet rs = executeQuery(sql);

@@ -9,6 +9,7 @@ import dbtools.Movie;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -39,7 +40,8 @@ public class Recommender {
 
 	private HBox selected;
 	private HBox selectedTo;
-	private HashMap<HBox, Movie> selectedMovies;
+	private HashMap<Node, Movie> selectedMovies;
+	private HashMap<Node, Movie> toPaneSelectedMovies;
 	private Stage parentStage;
 	private double xOffset = 0;
     private double yOffset = 0;
@@ -50,7 +52,8 @@ public class Recommender {
 	public Recommender(Stage recommenderStage, DatabaseTools data, MainGui mainGui) {
 		parentStage = recommenderStage;
 		this.data = data;
-		selectedMovies = new HashMap<HBox, Movie>();
+		selectedMovies = new HashMap<Node, Movie>();
+		toPaneSelectedMovies = new HashMap<Node, Movie>();
 		this.mainGui = mainGui;
 	}
 
@@ -67,24 +70,74 @@ public class Recommender {
 			addMovieList(data.getMovies(searchField.getText()));
 		});
 		add.setOnAction((obj) -> {
-			addMovieToToPane(selectedMovies.get(selected));
+			toPaneSelectedMovies.put(addMovieToToPane(selectedMovies.get(selected)), selectedMovies.get(selected));
 		});
 		remove.setOnAction((obj) -> {
+			toPaneSelectedMovies.remove(selectedTo);
 			toPane.getChildren().remove(selectedTo);
 		});
 		execute.setOnAction((obj) -> {
-			ArrayList<Movie> master = new ArrayList<Movie>();
 			if(!byDirector) {
-				for(Movie m : selectedMovies.values()) {
-
+				HashMap<String, Integer> genres = new HashMap<String, Integer>();
+				for(Node h : toPane.getChildren()) {
+					for(String s : data.getMovieGenres(toPaneSelectedMovies.get(h).getTitle())) {
+						genres.put(s, genres.get(s) != null ? genres.get(s)+1 : 1);
+					}
 				}
+				mainGui.infoPane.getChildren().clear();
+				for(String s : genres.keySet()) {
+					int i = 0;
+					mainGui.addMovieToPane(new Movie(-1, s));
+					for(Movie m : data.getMoviesByGenre(s, 100)) {
+						if(i > 4) {
+							break;
+						}
+						boolean flag = false;
+						for(Movie m2 : toPaneSelectedMovies.values()) {
+							if(m2.getTitle().equals(m.getTitle())) {
+								flag = true;
+							}
+						}
+						if(!flag) {
+							mainGui.addMovieToPane(m);
+							i++;
+						}
+					}
+				}
+				parentStage.hide();
 			} else {
-
+				HashMap<String, Integer> directors = new HashMap<String, Integer>();
+				for(Node h : toPane.getChildren()) {
+					for(DirectorResult d : data.getMovieDirector(toPaneSelectedMovies.get(h).getTitle())) {
+						directors.put(d.getDirectorName(), directors.get(d.getDirectorName()) != null ? directors.get(d.getDirectorName())+1 : 1);
+					}
+				}
+				mainGui.infoPane.getChildren().clear();
+				for(String s : directors.keySet()) {
+					int i = 0;
+					mainGui.addMovieToPane(new Movie(-1, s));
+					for(Movie m : data.getMoviesByDirector(s)) {
+						if(i > 4) {
+							break;
+						}
+						boolean flag = false;
+						for(Movie m2 : toPaneSelectedMovies.values()) {
+							if(m2.getTitle().equals(m.getTitle())) {
+								flag = true;
+							}
+						}
+						if(!flag) {
+							mainGui.addMovieToPane(m);
+							i++;
+						}
+					}
+				}
+				parentStage.hide();
 			}
 		});
 	}
 
-	public void addMovieToToPane(Movie m) {
+	public HBox addMovieToToPane(Movie m) {
 		HBox b = new HBox();
 		b.setMaxWidth(420);
 		b.setSpacing(20);
@@ -98,16 +151,17 @@ public class Recommender {
 			selectedTo = b;
 			selectedTo.setStyle("-fx-background-color: #ff0000;");
 		});
+		return b;
 	}
 
-	public void addMovieToFromPane(Movie m) {
+	public HBox addMovieToFromPane(Movie m) {
 		HBox b = new HBox();
 		b.setMaxWidth(420);
 		b.setSpacing(20);
 		b.setPrefHeight(25);
 		b.getChildren().add(new Label(m.getTitle()));
-		fromPane.getChildren().add(b);
 		selectedMovies.put(b, m);
+		fromPane.getChildren().add(b);
 		b.setOnMouseClicked((obj) -> {
 			if(selected != null) {
 				selected.setStyle("");
@@ -115,6 +169,7 @@ public class Recommender {
 			selected = b;
 			selected.setStyle("-fx-background-color: #ff0000;");
 		});
+		return b;
 	}
 
 	@FXML
@@ -148,7 +203,7 @@ public class Recommender {
 		    }
 		});
 	}
-
+	@FXML
 	public void clear() {
 		selectedMovies.clear();
 		fromPane.getChildren().clear();

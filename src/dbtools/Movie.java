@@ -100,6 +100,11 @@ public class Movie {
 		this.genres = genres;
 	}
 
+	public Movie(int i, String s) {
+		this.id = i;
+		this.title = s;
+	}
+
 	public String[] getGenres() {
 		return genres;
 	}

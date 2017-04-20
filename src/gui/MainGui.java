@@ -74,6 +74,7 @@ public class MainGui {
 		recommenderStage.setScene(new Scene(fxml.load(), Color.TRANSPARENT));
 		recommenderStage.initOwner(parentStage);
 		r.makeDraggable(r.rootPane);
+		r.initializeGui();
 	}
 
 	public void initializeGui() {
@@ -90,7 +91,13 @@ public class MainGui {
 
 	public void addMovieToPane(Movie m) {
 		if(m.getId() == -1) {
-
+			HBox b = new HBox();
+			b.setMaxWidth(420);
+			b.setSpacing(20);
+			b.setPrefHeight(25);
+			b.getChildren().add(new Label(m.getTitle()));
+			infoPane.getChildren().add(b);
+			b.setStyle("-fx-background-color: #ff00ff;");
 		} else {
 			HBox b = new HBox();
 			b.setMaxWidth(420);
@@ -116,8 +123,15 @@ public class MainGui {
 	private void loadMovieInfo(Movie m) {
 		infoBox.clear();
 		tagBox.clear();
-		image1.setImage(new Image(m.getImdbPictureURL()));
-		image2.setImage(new Image(m.getRtPictureURL()));
+		try {
+			image1.setImage(new Image(m.getImdbPictureURL()));
+		} catch (Exception e) {
+		}
+		try {
+			image2.setImage(new Image(m.getRtPictureURL()));
+		} catch(Exception e) {
+
+		}
     	infoBox.appendText(m.toString());
     	loadMovieTags(data.getMovieTags(m.getTitle()));
 	}
@@ -208,7 +222,6 @@ public class MainGui {
 			infoPane1.appendText(String.format("%-5s| %-25s | Score: %-2d | %-2d / %-2d / %-4d | %-2d : %-2d : %-2d\n", tf.getUserName(), tf.getMovieName().length() > 25 ? tf.getMovieName().subSequence(0, 22) + "..." : tf.getMovieName() , tf.getUserRating(), tf.getMonth(), tf.getDay(), tf.getYear(), tf.getHour(), tf.getMinute(), tf.getSecond()));
 		}
 	}
-
 
 	@FXML
 	private void getUserRatingTimeline(ActionEvent event) {
