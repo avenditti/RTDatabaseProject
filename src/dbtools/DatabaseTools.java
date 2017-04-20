@@ -19,7 +19,11 @@ public class DatabaseTools {
 	private Connection con;
 	private Statement db;
 	private ResultSet rs;
-	private String sqlInitializeLocation = "initialize.sql";
+	private static final String sqlInitializeLocation = "initialize.sql";
+	private static final String serverIP = "192.168.1.114";
+	private static final String port = "3306";
+	private static final String username = "root";
+	private static final String pass = "admin1234";
 
 	private boolean executeSQLFile(Statement  db, String filename) {
 		String in = "";
@@ -49,11 +53,11 @@ public class DatabaseTools {
 
 	public boolean initializeDatabase() {
 		try {
-			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/databaseproject?useSSL=false","root", "Mikedu(00");
+			con = DriverManager.getConnection("jdbc:mysql://" + serverIP + ":" + port + "/databaseproject?useSSL=false", username, pass);
 			db = con.createStatement();
 		} catch (SQLException e) {
 			try {
-				con = DriverManager.getConnection("jdbc:mysql://localhost:3306/?useSSL=false","root", "Mikedu(00");
+				con = DriverManager.getConnection("jdbc:mysql://" + serverIP + ":" + port + "/?useSSL=false", username, pass);
 				db = con.createStatement();
 				db.execute("create schema databaseproject");
 				db.execute("use databaseproject");
@@ -316,12 +320,34 @@ public class DatabaseTools {
          return movies;
 	}
 
+	public ArrayList<String> getMovieGenres(String movieTitle) {
+        String sql =
+        		"SELECT M.title, MG.genre " +
+        		"FROM movies M, movie_genres MG " +
+        		"WHERE lower(M.title) LIKE " + "\"%"+ formatMovieTitle(movieTitle) + "%\" AND MG.movieID = M.id " +
+				"ORDER BY M.title";
+        ArrayList<String> genres = new ArrayList<String>();
+		try {
+			ResultSet rs = db.executeQuery(sql);
+// --------------
+			while (rs.next()) {
+				if(!(genres.size() > 0)) {
+					genres.add(rs.getString(1));
+				}
+				genres.add(rs.getString(2));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return genres;
+	}
+
 	public ArrayList<Movie> getMovies(String movieTitle) {
         String sql =
-        		"SELECT * " +
-        		"FROM movies " +
-        		"WHERE lower(title) LIKE " + "\"%"+ formatMovieTitle(movieTitle) + "%\" " +
-				"ORDER BY title";
+        		"SELECT M.* " +
+        		"FROM movies M " +
+        		"WHERE lower(M.title) LIKE " + "\"%"+ formatMovieTitle(movieTitle) + "%\" " +
+				"ORDER BY M.title";
         ArrayList<Movie> movies = new ArrayList<Movie>();
 		try {
 			ResultSet rs = db.executeQuery(sql);

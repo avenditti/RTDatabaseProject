@@ -68,7 +68,7 @@ public class MainGui {
 		this.data = data;
 		recommenderStage = new Stage();
 		FXMLLoader fxml = new FXMLLoader(Recommender.class.getResource("Recommender.fxml"));
-		r = new Recommender(recommenderStage, data);
+		r = new Recommender(recommenderStage, data, this);
 		fxml.setController(r);
 		recommenderStage.initStyle(StageStyle.TRANSPARENT);
 		recommenderStage.setScene(new Scene(fxml.load(), Color.TRANSPARENT));
@@ -89,24 +89,28 @@ public class MainGui {
 	}
 
 	public void addMovieToPane(Movie m) {
-		HBox b = new HBox();
-		b.setMaxWidth(420);
-		b.setSpacing(20);
-		b.setPrefHeight(25);
-		b.getChildren().add(new Label(m.getTitle()));
-		infoPane.getChildren().add(b);
-		b.setOnMouseClicked((obj) -> {
-			if(selected != null) {
-				selected.setStyle("");
-			}
-			selected = b;
-			selected.setStyle("-fx-background-color: #ff0000;");
-			if(obj.getButton().equals(MouseButton.PRIMARY)){
-	            if(obj.getClickCount() == 2){
-	            	loadMovieInfo(m);
-	            }
-	        }
-		});
+		if(m.getId() == -1) {
+
+		} else {
+			HBox b = new HBox();
+			b.setMaxWidth(420);
+			b.setSpacing(20);
+			b.setPrefHeight(25);
+			b.getChildren().add(new Label(m.getTitle()));
+			infoPane.getChildren().add(b);
+			b.setOnMouseClicked((obj) -> {
+				if(selected != null) {
+					selected.setStyle("");
+				}
+				selected = b;
+				selected.setStyle("-fx-background-color: #ff0000;");
+				if(obj.getButton().equals(MouseButton.PRIMARY)){
+		            if(obj.getClickCount() == 2){
+		            	loadMovieInfo(m);
+		            }
+		        }
+			});
+		}
 	}
 
 	private void loadMovieInfo(Movie m) {
