@@ -2,9 +2,11 @@ package dbtools;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -12,6 +14,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class DatabaseTools {
@@ -19,11 +22,11 @@ public class DatabaseTools {
 	private Connection con;
 	private Statement db;
 	private ResultSet rs;
-	private static final String sqlInitializeLocation = "initialize.sql";
-	private static final String serverIP = "localhost";
-	private static final String port = "3306";
-	private static final String username = "root";
-	private static final String pass = "admin1234";
+	private String sqlInitializeLocation = this.getClass().getResource("initialize.sql").getPath();
+	private String serverIP = "";
+	private String port = "";
+	private String username = "";
+	private String pass = "";
 
 	private boolean executeSQLFile(Statement  db, String filename) {
 		String in = "";
@@ -57,6 +60,26 @@ public class DatabaseTools {
 	}
 
 	public boolean initializeDatabase() {
+		Properties prop = new Properties();
+		InputStream is = null;
+		try {
+			is = new FileInputStream("config.properties");
+			prop.load(is);
+			this.serverIP = prop.getProperty("database");
+			this.username = prop.getProperty("dbuser");
+			this.pass = prop.getProperty("dbpassword");
+			this.port = prop.getProperty("dbport");
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			if(is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+				}
+			}
+			System.out.println("Problem with config file");
+		}
+
 		try {
 			con = DriverManager.getConnection("jdbc:mysql://" + serverIP + ":" + port + "/databaseproject?useSSL=false", username, pass);
 			db = con.createStatement();
