@@ -40,17 +40,18 @@ public class Recommender {
 	private HBox selected;
 	private HBox selectedTo;
 	private HashMap<HBox, Movie> selectedMovies;
-	private HashMap<HBox, DirectorResult> selectedDirectors;
 	private Stage parentStage;
 	private double xOffset = 0;
     private double yOffset = 0;
     private DatabaseTools data;
+    private MainGui mainGui;
+    private boolean byDirector = false;
 
-	public Recommender(Stage recommenderStage, DatabaseTools data) {
+	public Recommender(Stage recommenderStage, DatabaseTools data, MainGui mainGui) {
 		parentStage = recommenderStage;
 		this.data = data;
 		selectedMovies = new HashMap<HBox, Movie>();
-		selectedDirectors = new HashMap<HBox, DirectorResult>();
+		this.mainGui = mainGui;
 	}
 
 	public void addMovieList(ArrayList<Movie> movies) {
@@ -60,43 +61,26 @@ public class Recommender {
 		}
 	}
 
-	public void addDirectorList(ArrayList<DirectorResult> d) {
-		fromPane.getChildren().clear();
-		for(DirectorResult m : d) {
-			addDirectorToFromPane(m);
-		}
-	}
-
-	public void addDirectorToToPane(DirectorResult d) {
-		HBox b = new HBox();
-		b.setMaxWidth(420);
-		b.setSpacing(20);
-		b.setPrefHeight(25);
-		b.getChildren().add(new Label(d.getDirectorName()));
-		toPane.getChildren().add(b);
-		b.setOnMouseClicked((obj) -> {
-			if(selectedTo != null) {
-				selectedTo.setStyle("");
-			}
-			selectedTo = b;
-			selectedTo.setStyle("-fx-background-color: #ff0000;");
+	public void initializeGui() {
+		searchField.setPromptText("Enter Movie Name");
+		searchButton.setOnAction((obj) -> {
+			addMovieList(data.getMovies(searchField.getText()));
 		});
-	}
+		add.setOnAction((obj) -> {
+			addMovieToToPane(selectedMovies.get(selected));
+		});
+		remove.setOnAction((obj) -> {
+			toPane.getChildren().remove(selectedTo);
+		});
+		execute.setOnAction((obj) -> {
+			ArrayList<Movie> master = new ArrayList<Movie>();
+			if(!byDirector) {
+				for(Movie m : selectedMovies.values()) {
 
-	public void addDirectorToFromPane(DirectorResult d) {
-		HBox b = new HBox();
-		b.setMaxWidth(420);
-		b.setSpacing(20);
-		b.setPrefHeight(25);
-		b.getChildren().add(new Label(d.getDirectorName()));
-		fromPane.getChildren().add(b);
-		selectedDirectors.put(b, d);
-		b.setOnMouseClicked((obj) -> {
-			if(selected != null) {
-				selected.setStyle("");
+				}
+			} else {
+
 			}
-			selected = b;
-			selected.setStyle("-fx-background-color: #ff0000;");
 		});
 	}
 
@@ -135,32 +119,12 @@ public class Recommender {
 
 	@FXML
 	private void recByDirectors(ActionEvent e) {
-		clear();
-		searchField.setPromptText("Enter Director Name");
-		searchButton.setOnAction((obj) -> {
-			addDirectorList(data.getDirector(searchField.getText()));
-		});
-		add.setOnAction((obj) -> {
-			addDirectorToToPane(selectedDirectors.get(selected));
-		});
-		remove.setOnAction((obj) -> {
-			toPane.getChildren().remove(selectedTo);
-		});
+		this.byDirector = true;
 	}
 
 	@FXML
 	private void recByMovies(ActionEvent e) {
-		clear();
-		searchField.setPromptText("Enter Movie Name");
-		searchButton.setOnAction((obj) -> {
-			addMovieList(data.getMovies(searchField.getText()));
-		});
-		add.setOnAction((obj) -> {
-			addMovieToToPane(selectedMovies.get(selected));
-		});
-		remove.setOnAction((obj) -> {
-			toPane.getChildren().remove(selectedTo);
-		});
+		this.byDirector = false;
 	}
 
 	@FXML
@@ -187,7 +151,6 @@ public class Recommender {
 
 	public void clear() {
 		selectedMovies.clear();
-		selectedDirectors.clear();
 		fromPane.getChildren().clear();
 		toPane.getChildren().clear();
 	}
